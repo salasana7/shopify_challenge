@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const db =  require('./db/database')
 
 const app = express();
 
@@ -10,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 // static middleware
 app.use(express.static(path.join(__dirname, "../public")));
 
-// app.use("/api", require("./api"));
+app.use("/api", require("./api/cats"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
@@ -31,8 +32,13 @@ app.use((err, req, res, next) => {
 // listen on a port
 const PORT = 3000;
 
-app.listen(PORT, function () {
-  console.log(`Server is listening on port ${PORT}!`);
-});
+const init = async function () {
+  await db.sync();
+  app.listen(PORT, function () {
+    console.log(`Server is listening on port ${PORT}!`);
+  });
+};
+
+init();
 
 module.exports = app;
